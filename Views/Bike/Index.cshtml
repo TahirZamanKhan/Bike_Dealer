@@ -1,0 +1,157 @@
+﻿@model cloudscribe.Pagination.Models.PagedResult<Bike>
+@using vroom.Helpers
+@{
+    ViewData["Title"] = "Index";
+    ViewData["Controller"] = "Bike";
+    ViewData["Action"] = "Index";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br /><br />
+<form asp-action="Index" method="get">
+ 
+
+    
+
+    <div class="container">        
+        <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="2000" data-pause="hover">
+         
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner" role="listbox">
+                <div class="item active">
+                    <div class="carousel-content">
+                        <div style="margin: 0 auto">
+                            <p>
+                                <img alt="The 1st Message." src="~/images/bike3.jpg"
+                                     style="width: 83vw ;height: 100vh" />
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="carousel-content">
+                        <div style="margin: 0 auto">
+                            <p>
+                                <img alt="The 2nd Message." src="~/images/bike2.jpg"
+                                     style="width: 83vw ;height: 100vh" />
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only"> Previous</span>
+            </a>
+            <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    </div>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style type="text/css">
+        .carousel-inner {
+            width: 83vw;
+            height: 100vh;
+            max-height: 100vh !important;
+        }
+
+        .carousel-content {
+            color: black;
+            display: flex;
+            text-align: center;
+        }
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.carousel').carousel();
+        });
+    </script>
+
+    <br />
+    <br />
+    <div>
+        <p>
+            Find Make: <input type="text" name="searchString" value="@ViewBag.CurrentFilter" />
+            <input type="submit" value="Search" class="btn btn-info" /> |
+            <a asp-action="Index">Remove Filter</a>
+
+        </p>
+    </div>
+
+</form>
+<div class="row">
+    <div class="col-6">
+        <h2 class="text-info">Bikes</h2>
+    </div>
+   @if(User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Executive))
+    { 
+        <div class="col-6 text-right">
+            <a class="btn btn-info" asp-action="Create"><i class="fas fa-motorcycle"></i> &nbsp; Add New Bike</a>
+        </div>
+    }
+    <br />
+    <div class="col-12">
+        <table class="table table-striped border">
+            <tr class="table-info">
+                <th>Bike Photo</th>
+                <th>Bike Detail</th>
+                <th>
+                    <a asp-action="Index"
+                       asp-route-searchString="@ViewBag.CurrentFilter"
+                       asp-route-sortOrder="@ViewBag.PriceSortParam"
+                       asp-route-pageNumber="@Model.PageNumber">
+                        Price
+                    </a>
+                </th>
+                <th>Seller Information</th>
+                @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Executive))
+                {
+                    <th></th>
+                }
+                else
+                {
+                    <th class="text-right">View Details</th>
+                }
+            </tr>
+            @foreach (var item in Model.Data)
+            {
+            <tr>
+                <td><img src="@Html.DisplayFor(m => item.ImagePath)" width="150" height="100" /></td>
+                <td>
+                    <b>@Html.DisplayFor(m => item.Make.Name) (@Html.DisplayFor(m => item.Year))</b> <br />
+                    <b>Model: </b>@Html.DisplayFor(m => item.Model.Name)<br />
+                    <b>Mileage: </b>@Html.DisplayFor(m => item.Mileage)
+                </td>
+                <td>@Html.DisplayFor(m => item.Price) @Html.DisplayFor(m => item.Currency)</td>
+                <td>
+                    <b>Name: </b> @Html.DisplayFor(m => item.SellerName)<br />
+                    <b>Email: </b>@Html.DisplayFor(m => item.SellerEmail)<br />
+                    <b>Phone: </b>@Html.DisplayFor(m => item.SellerPhone)
+                </td>
+
+                @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Executive))
+                {
+                    <partial name="_TableButtonPartials" model="item.Id" />
+                }
+                else
+                {
+                    <td class="text-right">
+                        <div class="btn-group" role="group">
+                            <a type="button" class="btn btn-primary" href="@Url.Action("View/"+item.Id)"><i class="fas fa-search-plus"></i></a>
+                        </div>
+                    </td>
+                }
+            </tr>
+            }
+        </table> 
+        <partial name="_PaginationPartial" view-data="ViewData" model="Model" />
+    </div>
+</div>
+
+
